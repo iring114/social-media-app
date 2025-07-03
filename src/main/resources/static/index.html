@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社交媒體應用</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar {
+            margin-bottom: 20px;
+            background-color: #6c757d;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+        #loginForm, #registerForm {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .post-content {
+            white-space: pre-line;
+        }
+        .comment-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .comment {
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .comment:last-child {
+            border-bottom: none;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">社交媒體應用</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="homeLink">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="profileLink">個人資料</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item" id="loginNavItem">
+                        <a class="nav-link" href="#" id="loginLink">登入</a>
+                    </li>
+                    <li class="nav-item" id="registerNavItem">
+                        <a class="nav-link" href="#" id="registerLink">註冊</a>
+                    </li>
+                    <li class="nav-item hidden" id="logoutNavItem">
+                        <a class="nav-link" href="#" id="logoutLink">登出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 登入表單 -->
+        <div id="loginForm" class="hidden">
+            <h2 class="text-center mb-4">登入</h2>
+            <div class="alert alert-danger hidden" id="loginError"></div>
+            <form id="loginFormElement">
+                <div class="mb-3">
+                    <label for="loginPhoneNumber" class="form-label">手機號碼</label>
+                    <input type="text" class="form-control" id="loginPhoneNumber" required>
+                </div>
+                <div class="mb-3">
+                    <label for="loginPassword" class="form-label">密碼</label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">登入</button>
+            </form>
+        </div>
+
+        <!-- 註冊表單 -->
+        <div id="registerForm" class="hidden">
+            <h2 class="text-center mb-4">註冊</h2>
+            <div class="alert alert-danger hidden" id="registerError"></div>
+            <form id="registerFormElement">
+                <div class="mb-3">
+                    <label for="registerUserName" class="form-label">用戶名稱</label>
+                    <input type="text" class="form-control" id="registerUserName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="registerEmail" class="form-label">電子郵件</label>
+                    <input type="email" class="form-control" id="registerEmail" required>
+                </div>
+                <div class="mb-3">
+                    <label for="registerPhoneNumber" class="form-label">手機號碼</label>
+                    <input type="text" class="form-control" id="registerPhoneNumber" required>
+                </div>
+                <div class="mb-3">
+                    <label for="registerPassword" class="form-label">密碼</label>
+                    <input type="password" class="form-control" id="registerPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label for="registerBiography" class="form-label">個人簡介</label>
+                    <textarea class="form-control" id="registerBiography" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">註冊</button>
+            </form>
+        </div>
+
+        <!-- 首頁內容 -->
+        <div id="homeContent" class="hidden">
+            <!-- 發文表單 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">發表新貼文</h5>
+                    <form id="postForm">
+                        <div class="mb-3">
+                            <textarea class="form-control" id="postContent" rows="3" placeholder="分享你的想法..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="postImage" class="form-label">圖片URL (選填)</label>
+                            <input type="text" class="form-control" id="postImage" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <button type="submit" class="btn btn-primary">發布</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 發文列表 -->
+            <h3 class="mb-3">最新貼文</h3>
+            <div id="postsList"></div>
+        </div>
+
+        <!-- 個人資料頁面 -->
+        <div id="profileContent" class="hidden">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title" id="profileUserName"></h3>
+                    <p class="card-text" id="profileEmail"></p>
+                    <p class="card-text" id="profilePhoneNumber"></p>
+                    <p class="card-text" id="profileBiography"></p>
+                </div>
+            </div>
+
+            <h3 class="mb-3">我的貼文</h3>
+            <div id="userPostsList"></div>
+        </div>
+    </div>
+
+    <!-- 貼文模板 -->
+    <template id="postTemplate">
+        <div class="card post-card">
+            <div class="card-body">
+                <h5 class="card-title post-user"></h5>
+                <p class="card-text post-content"></p>
+                <div class="post-image-container mb-3 hidden">
+                    <img class="img-fluid post-image" src="" alt="貼文圖片">
+                </div>
+                <p class="card-text"><small class="text-muted post-time"></small></p>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-sm btn-outline-primary show-comments-btn">查看留言 (<span class="comment-count">0</span>)</button>
+                    <div class="post-actions hidden">
+                        <button class="btn btn-sm btn-outline-warning edit-post-btn">編輯</button>
+                        <button class="btn btn-sm btn-outline-danger delete-post-btn">刪除</button>
+                    </div>
+                </div>
+                <div class="comment-section hidden">
+                    <div class="comments-list mb-3"></div>
+                    <form class="comment-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control comment-input" placeholder="添加留言...">
+                            <button class="btn btn-outline-primary add-comment-btn" type="submit">發送</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 留言模板 -->
+    <template id="commentTemplate">
+        <div class="comment">
+            <div class="d-flex justify-content-between">
+                <h6 class="comment-user"></h6>
+                <small class="text-muted comment-time"></small>
+            </div>
+            <p class="comment-content"></p>
+        </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // API基礎URL
+        const API_BASE_URL = '/api';
+        
+        // DOM元素
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const homeContent = document.getElementById('homeContent');
+        const profileContent = document.getElementById('profileContent');
+        const loginNavItem = document.getElementById('loginNavItem');
+        const registerNavItem = document.getElementById('registerNavItem');
+        const logoutNavItem = document.getElementById('logoutNavItem');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+        const postsList = document.getElementById('postsList');
+        const userPostsList = document.getElementById('userPostsList');
+        const postTemplate = document.getElementById('postTemplate');
+        const commentTemplate = document.getElementById('commentTemplate');
+        
+        // 導航鏈接
+        document.getElementById('homeLink').addEventListener('click', showHome);
+        document.getElementById('profileLink').addEventListener('click', showProfile);
+        document.getElementById('loginLink').addEventListener('click', showLoginForm);
+        document.getElementById('registerLink').addEventListener('click', showRegisterForm);
+        document.getElementById('logoutLink').addEventListener('click', logout);
+        
+        // 表單提交
+        document.getElementById('loginFormElement').addEventListener('submit', handleLogin);
+        document.getElementById('registerFormElement').addEventListener('submit', handleRegister);
+        document.getElementById('postForm').addEventListener('submit', handleCreatePost);
+        
+        // 初始化頁面
+        initPage();
+        
+        // 初始化頁面
+        function initPage() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // 已登入
+                loginNavItem.classList.add('hidden');
+                registerNavItem.classList.add('hidden');
+                logoutNavItem.classList.remove('hidden');
+                showHome();
+            } else {
+                // 未登入
+                loginNavItem.classList.remove('hidden');
+                registerNavItem.classList.remove('hidden');
+                logoutNavItem.classList.add('hidden');
+                showLoginForm();
+            }
+        }
+        
+        // 顯示登入表單
+        function showLoginForm() {
+            hideAllContent();
+            loginForm.classList.remove('hidden');
+        }
+        
+        // 顯示註冊表單
+        function showRegisterForm() {
+            hideAllContent();
+            registerForm.classList.remove('hidden');
+        }
+        
+        // 顯示首頁
+        function showHome() {
+            if (!isLoggedIn()) {
+                showLoginForm();
+                return;
+            }
+            hideAllContent();
+            homeContent.classList.remove('hidden');
+            fetchAllPosts();
+        }
+        
+        // 顯示個人資料
+        function showProfile() {
+            if (!isLoggedIn()) {
+                showLoginForm();
+                return;
+            }
+            hideAllContent();
+            profileContent.classList.remove('hidden');
+            fetchCurrentUser();
+            fetchUserPosts();
+        }
+        
+        // 隱藏所有內容
+        function hideAllContent() {
+            loginForm.classList.add('hidden');
+            registerForm.classList.add('hidden');
+            homeContent.classList.add('hidden');
+            profileContent.classList.add('hidden');
+            loginError.classList.add('hidden');
+            registerError.classList.add('hidden');
+        }
+        
+        // 檢查是否已登入
+        function isLoggedIn() {
+            return localStorage.getItem('token') !== null;
+        }
+        
+        // 獲取授權頭
+        function getAuthHeader() {
+            const token = localStorage.getItem('token');
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        }
+        
+        // 處理登入
+        async function handleLogin(event) {
+            event.preventDefault();
+            const phoneNumber = document.getElementById('loginPhoneNumber').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phoneNumber,
+                        password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('userId', data.data.user.userId);
+                    initPage();
+                } else {
+                    loginError.textContent = data.message || '登入失敗';
+                    loginError.classList.remove('hidden');
+                }
+            } catch (error) {
+                loginError.textContent = '發生錯誤，請稍後再試';
+                loginError.classList.remove('hidden');
+                console.error('Login error:', error);
+            }
+        }
+        
+        // 處理註冊
+        async function handleRegister(event) {
+            event.preventDefault();
+            const userName = document.getElementById('registerUserName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phoneNumber = document.getElementById('registerPhoneNumber').value;
+            const password = document.getElementById('registerPassword').value;
+            const biography = document.getElementById('registerBiography').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userName,
+                        email,
+                        phoneNumber,
+                        password,
+                        biography
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showLoginForm();
+                    alert('註冊成功，請登入');
+                } else {
+                    registerError.textContent = data.message || '註冊失敗';
+                    registerError.classList.remove('hidden');
+                }
+            } catch (error) {
+                registerError.textContent = '發生錯誤，請稍後再試';
+                registerError.classList.remove('hidden');
+                console.error('Register error:', error);
+            }
+        }
+        
+        // 登出
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            initPage();
+        }
+        
+        // 獲取當前用戶信息
+        async function fetchCurrentUser() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/me`, {
+                    headers: getAuthHeader()
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    const user = data.data;
+                    document.getElementById('profileUserName').textContent = user.userName;
+                    document.getElementById('profileEmail').textContent = `電子郵件: ${user.email}`;
+                    document.getElementById('profilePhoneNumber').textContent = `手機號碼: ${user.phoneNumber}`;
+                    document.getElementById('profileBiography').textContent = user.biography || '暫無個人簡介';
+                }
+            } catch (error) {
+                console.error('Fetch user error:', error);
+            }
+        }
+        
+        // 獲取所有發文
+        async function fetchAllPosts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts`, {
+                    headers: getAuthHeader()
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    renderPosts(data.data, postsList, false);
+                }
+            } catch (error) {
+                console.error('Fetch posts error:', error);
+            }
+        }
+        
+        // 獲取用戶發文
+        async function fetchUserPosts() {
+            const userId = localStorage.getItem('userId');
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts/user/${userId}`, {
+                    headers: getAuthHeader()
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    renderPosts(data.data, userPostsList, true);
+                }
+            } catch (error) {
+                console.error('Fetch user posts error:', error);
+            }
+        }
+        
+        // 渲染發文列表
+        function renderPosts(posts, container, isUserPosts) {
+            container.innerHTML = '';
+            const currentUserId = localStorage.getItem('userId');
+            
+            if (posts.length === 0) {
+                container.innerHTML = '<p class="text-center">暫無發文</p>';
+                return;
+            }
+            
+            posts.forEach(post => {
+                const postElement = postTemplate.content.cloneNode(true);
+                const postCard = postElement.querySelector('.post-card');
+                
+                postCard.dataset.postId = post.postId;
+                postElement.querySelector('.post-user').textContent = post.userName;
+                postElement.querySelector('.post-content').textContent = post.content;
+                
+                // 設置圖片
+                if (post.image) {
+                    const imageContainer = postElement.querySelector('.post-image-container');
+                    const image = postElement.querySelector('.post-image');
+                    image.src = post.image;
+                    imageContainer.classList.remove('hidden');
+                }
+                
+                // 設置時間
+                const createdAt = new Date(post.createdAt);
+                postElement.querySelector('.post-time').textContent = `發布於 ${createdAt.toLocaleString()}`;
+                
+                // 設置留言數量
+                postElement.querySelector('.comment-count').textContent = post.commentCount;
+                
+                // 設置編輯和刪除按鈕
+                if (post.userId == currentUserId) {
+                    const postActions = postElement.querySelector('.post-actions');
+                    postActions.classList.remove('hidden');
+                    
+                    // 編輯按鈕事件
+                    postElement.querySelector('.edit-post-btn').addEventListener('click', () => {
+                        handleEditPost(post.postId);
+                    });
+                    
+                    // 刪除按鈕事件
+                    postElement.querySelector('.delete-post-btn').addEventListener('click', () => {
+                        handleDeletePost(post.postId, isUserPosts);
+                    });
+                }
+                
+                // 查看留言按鈕事件
+                postElement.querySelector('.show-comments-btn').addEventListener('click', (event) => {
+                    const commentSection = event.target.closest('.card-body').querySelector('.comment-section');
+                    if (commentSection.classList.contains('hidden')) {
+                        commentSection.classList.remove('hidden');
+                        fetchComments(post.postId, commentSection.querySelector('.comments-list'));
+                    } else {
+                        commentSection.classList.add('hidden');
+                    }
+                });
+                
+                // 添加留言表單事件
+                postElement.querySelector('.comment-form').addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const input = event.target.querySelector('.comment-input');
+                    const content = input.value.trim();
+                    if (content) {
+                        handleAddComment(post.postId, content, input);
+                    }
+                });
+                
+                container.appendChild(postElement);
+            });
+        }
+        
+        // 獲取發文的留言
+        async function fetchComments(postId, container) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/comments/post/${postId}`, {
+                    headers: getAuthHeader()
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    renderComments(data.data, container);
+                }
+            } catch (error) {
+                console.error('Fetch comments error:', error);
+            }
+        }
+        
+        // 渲染留言列表
+        function renderComments(comments, container) {
+            container.innerHTML = '';
+            
+            if (comments.length === 0) {
+                container.innerHTML = '<p class="text-center">暫無留言</p>';
+                return;
+            }
+            
+            comments.forEach(comment => {
+                const commentElement = commentTemplate.content.cloneNode(true);
+                
+                commentElement.querySelector('.comment-user').textContent = comment.userName;
+                commentElement.querySelector('.comment-content').textContent = comment.content;
+                
+                // 設置時間
+                const createdAt = new Date(comment.createdAt);
+                commentElement.querySelector('.comment-time').textContent = createdAt.toLocaleString();
+                
+                container.appendChild(commentElement);
+            });
+        }
+        
+        // 處理創建發文
+        async function handleCreatePost(event) {
+            event.preventDefault();
+            const content = document.getElementById('postContent').value.trim();
+            const image = document.getElementById('postImage').value.trim();
+            
+            if (!content) {
+                alert('請輸入發文內容');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts`, {
+                    method: 'POST',
+                    headers: getAuthHeader(),
+                    body: JSON.stringify({
+                        content,
+                        image: image || null
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    document.getElementById('postContent').value = '';
+                    document.getElementById('postImage').value = '';
+                    fetchAllPosts();
+                } else {
+                    alert(data.message || '發文失敗');
+                }
+            } catch (error) {
+                alert('發生錯誤，請稍後再試');
+                console.error('Create post error:', error);
+            }
+        }
+        
+        // 處理編輯發文
+        async function handleEditPost(postId) {
+            const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
+            const currentContent = postCard.querySelector('.post-content').textContent;
+            const currentImage = postCard.querySelector('.post-image')?.src || '';
+            
+            const newContent = prompt('編輯發文內容:', currentContent);
+            if (newContent === null) return; // 用戶取消
+            
+            const newImage = prompt('編輯圖片URL (留空表示無圖片):', currentImage);
+            if (newImage === null) return; // 用戶取消
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+                    method: 'PUT',
+                    headers: getAuthHeader(),
+                    body: JSON.stringify({
+                        content: newContent.trim(),
+                        image: newImage.trim() || null
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // 更新UI
+                    postCard.querySelector('.post-content').textContent = newContent;
+                    const imageContainer = postCard.querySelector('.post-image-container');
+                    const image = postCard.querySelector('.post-image');
+                    
+                    if (newImage) {
+                        image.src = newImage;
+                        imageContainer.classList.remove('hidden');
+                    } else {
+                        imageContainer.classList.add('hidden');
+                    }
+                } else {
+                    alert(data.message || '更新發文失敗');
+                }
+            } catch (error) {
+                alert('發生錯誤，請稍後再試');
+                console.error('Update post error:', error);
+            }
+        }
+        
+        // 處理刪除發文
+        async function handleDeletePost(postId, isUserPosts) {
+            if (!confirm('確定要刪除這篇發文嗎？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeader()
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // 更新UI
+                    if (isUserPosts) {
+                        fetchUserPosts();
+                    } else {
+                        fetchAllPosts();
+                    }
+                } else {
+                    alert(data.message || '刪除發文失敗');
+                }
+            } catch (error) {
+                alert('發生錯誤，請稍後再試');
+                console.error('Delete post error:', error);
+            }
+        }
+        
+        // 處理添加留言
+        async function handleAddComment(postId, content, inputElement) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/comments`, {
+                    method: 'POST',
+                    headers: getAuthHeader(),
+                    body: JSON.stringify({
+                        postId,
+                        content
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // 清空輸入框
+                    inputElement.value = '';
+                    
+                    // 重新獲取留言
+                    const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
+                    const commentsList = postCard.querySelector('.comments-list');
+                    fetchComments(postId, commentsList);
+                    
+                    // 更新留言數量
+                    const commentCount = postCard.querySelector('.comment-count');
+                    commentCount.textContent = parseInt(commentCount.textContent) + 1;
+                } else {
+                    alert(data.message || '添加留言失敗');
+                }
+            } catch (error) {
+                alert('發生錯誤，請稍後再試');
+                console.error('Add comment error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
